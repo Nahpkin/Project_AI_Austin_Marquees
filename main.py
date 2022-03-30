@@ -13,6 +13,8 @@ def main():
     myPossibilistics = []
     myQualitatives = []
     myFeasibleObjects = []
+
+    # Parsing files for later use
     parse_attributes_file("Attributes.txt", myAttributes)
     parse_constraints_file("Constraints.txt", myAttributes, myConstraints)
     parse_logic_file("Logics.txt", myPenalties, myPossibilistics, myQualitatives, myAttributes)
@@ -22,6 +24,7 @@ def main():
 
     # Storing feasible objects AS NUMBERS
     store_feasible_objects('CLASPOutput.txt', myFeasibleObjects, myAttributes)
+
 
 # Parses the Attributes file from Words to Binary Logic (Stored in list of Attribute objects)
 def parse_attributes_file(file_name, attributes):
@@ -266,18 +269,35 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
 def store_feasible_objects(file_name, feasible_objects, attributes):
     clasp_output = open(file_name, 'r')
 
+    # Converting words to numbers for CLASP later on
     index = 0
     for line in clasp_output.readlines():
         if line[0] == 'v':
             feasible_objects.append(Feasible())
             line = line.split('v ')
             line.remove(line[0])
-            # line = line.split(' 0\n')
-            feasible_objects[index].name_as_num = line
+            line = line[0].split(' 0\n')
+            feasible_objects[index].name_as_num = line[0]
             index += 1
 
-    test = feasible_objects[1].name_as_num
-    print(test)
+    # Converting numbers back to words for output
+    for object in feasible_objects:
+        # Splitting numbers by spaces
+        individual_feasibleobject_list = object.name_as_num.split(' ')
+        attribute_index = 0
+        object.name += '<'
+        for number in individual_feasibleobject_list:
+            number = int(number)
+            if number == attributes[attribute_index].numop1:
+                object.name += attributes[attribute_index].op1 + ' '
+            elif number == attributes[attribute_index].numop2:
+                object.name += attributes[attribute_index].op2 + ' '
+            attribute_index += 1
+        object.name += '>'
+
+
+
+
 
 
 # Call main
