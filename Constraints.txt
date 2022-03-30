@@ -1,0 +1,6 @@
+soup OR NOT fish OR NOT ice-cream
+salad OR beef OR cake
+beer OR ice-cream
+soup OR ice-cream OR beer
+NOT soup OR fish
+NOT beer OR NOT ice-cream
