@@ -27,3 +27,10 @@ class Penalty:
         self.pen = 0
         self.input = ""
         self.output = ""
+
+class Possibilistic:
+    def __init__(self):
+        self.num = 0
+        self.tol = 0
+        self.input = ""
+        self.output = ""

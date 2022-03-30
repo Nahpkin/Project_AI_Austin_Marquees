@@ -150,10 +150,10 @@ def parse_logic_file(file_name, penalties, possibilistics, qualitatives, attribu
 
     # Call parse functions to store Logics in respective Objects
     parse_penalty_logic(pen_input, penalties, attributes)
-    # parse_possibilistic_logic(possib_input, possibilistics)
+    parse_possibilistic_logic(possib_input, possibilistics, attributes)
     # parse_qualitative_logic(qual_input, qualitatives)
 
-# TODO: Needs to be cleaned up
+# Parses penalty logic into Object Penalty format
 def parse_penalty_logic(pen_input, penalties, attributes):
     i = 1
     penalties.append(Penalty())
@@ -163,7 +163,10 @@ def parse_penalty_logic(pen_input, penalties, attributes):
 
         # Split line into tokens
         penalties[i].input = pen_input[i]
-        tokens = re.split(r'[\s,]+', pen_input[i][1])
+        tokens = re.split(r'[,]+', pen_input[i][0])
+        penalties[i].penalty = tokens[1]
+        tokens = tokens[0].split(" ")
+        print(tokens)
 
         j = 0
         while j < len(tokens):
@@ -173,9 +176,9 @@ def parse_penalty_logic(pen_input, penalties, attributes):
                 while (tokens[j + 1] != attributes[k].op1) & (tokens[j + 1] != attributes[k].op2):
                     k += 1
                 if tokens[j + 1] == attributes[k].op1:
-                    penalties[i].output += " " + str(attributes[k].numop2)
+                    penalties[i].output += str(attributes[k].numop2) + " "
                 if tokens[j + 1] == attributes[k].op2:
-                    penalties[i].output += " " + str(attributes[k].numop1)
+                    penalties[i].output += str(attributes[k].numop1) + " "
                 j += 2
                 continue
             # Case: OR condition
@@ -188,29 +191,84 @@ def parse_penalty_logic(pen_input, penalties, attributes):
                 break
                 # Case: AND condition
             elif tokens[j] == "AND":
-                i += 1
+                penalties[i].output += "\n"
+                j += 1
                 continue
-            elif tokens[j] == [1-100]:
-                penalties[i].penalty = tokens[j]
             else:
                 k = 0
-                while ((tokens[j] != attributes[k].op1) & (tokens[j] != attributes[k].op2)):
+                while (tokens[j] != attributes[k].op1) & (tokens[j] != attributes[k].op2):
                     # Iterative variable
                     k += 1
                 if tokens[j] == attributes[k].op1:
-                    penalties[i].output += " " + str(attributes[k].numop1)
+                    penalties[i].output += str(attributes[k].numop1) + " "
                 if tokens[j] == attributes[k].op2:
-                    penalties[i].output += " " + str(attributes[k].numop2)
+                    penalties[i].output += str(attributes[k].numop2) + " "
             # Iterative variable
             j += 1
-    for pen in penalties:
-        print(pen.output)
+        i += 1
+
+   # for pen in penalties:
+       # print(pen.output + pen_pen)
 
 
 
-# def parse_possibilistic_logic(possib_input, possibilistics):
+def parse_possibilistic_logic(possib_input, possibilistics, attributes):
+    i = 1
+    possibilistics.append(Possibilistic())
+    while i < len(possib_input):
+        # Add new Penalty object to list
+        possibilistics.append(Possibilistic())
 
+        # Split line into tokens
+        possibilistics[i].input = possib_input[i]
+        tokens = re.split(r'[,]+', possib_input[i][0])
+        possibilistics[i].tol = tokens[1]
+        tokens = tokens[0].split(" ")
+        print(tokens)
 
+        j = 0
+        while j < len(tokens):
+            # Case: NOT condition
+            if tokens[j] == "NOT":
+                k = 0
+                while (tokens[j + 1] != attributes[k].op1) & (tokens[j + 1] != attributes[k].op2):
+                    k += 1
+                if tokens[j + 1] == attributes[k].op1:
+                    possibilistics[i].output += str(attributes[k].numop2) + " "
+                if tokens[j + 1] == attributes[k].op2:
+                    possibilistics[i].output += str(attributes[k].numop1) + " "
+                j += 2
+                continue
+            # Case: OR condition
+            elif tokens[j] == "OR":
+                # Iterative variable
+                j += 1
+                continue
+            # Case: for EOL and random empty block
+            elif tokens[j] == '':
+                break
+                # Case: AND condition
+            elif tokens[j] == "AND":
+                possibilistics[i].output += "\n"
+                j += 1
+                continue
+            else:
+                k = 0
+                while (tokens[j] != attributes[k].op1) & (tokens[j] != attributes[k].op2):
+                    # Iterative variable
+                    k += 1
+                if tokens[j] == attributes[k].op1:
+                    possibilistics[i].output += str(attributes[k].numop1) + " "
+                if tokens[j] == attributes[k].op2:
+                    possibilistics[i].output += str(attributes[k].numop2) + " "
+            # Iterative variable
+            j += 1
+        i += 1
+
+    for possib in possibilistics:
+        print(possib.output)
+
+# TODO: Last thing that we will do
 # def parse_qualitative_logic(qual_input, poissibilistics)
 
 
