@@ -34,3 +34,17 @@ class Possibilistic:
         self.tol = 0
         self.input = ""
         self.output = ""
+
+class Feasible:
+    def __init__(self):
+        self.num = 0
+        self.name = ""
+        self.pen1 = 0
+        self.pen2 = 0
+        self.pen3 = 0
+        self.pen_total = 0
+        self.possib1 = 0
+        self.possib2 = 0
+        self.possib3 = 0
+        self.possib_total = 0
+
