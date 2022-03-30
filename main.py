@@ -6,7 +6,7 @@ import re
 
 # Main method
 def main():
-    # Make list of Attribute objects
+    # Make list of objects for program
     myAttributes = []
     myConstraints = []
     myPenalties = []
@@ -14,7 +14,7 @@ def main():
     myQualitatives = []
     myFeasibleObjects = []
 
-    # Parsing files for later use
+    # Parsing methods for files given
     parse_attributes_file("Attributes.txt", myAttributes)
     parse_constraints_file("Constraints.txt", myAttributes, myConstraints)
     parse_logic_file("Logics.txt", myPenalties, myPossibilistics, myQualitatives, myAttributes)
@@ -22,7 +22,7 @@ def main():
     # Call Clasp and write to file
     os.system("clasp CNF.txt -n 0 > CLASPOutput.txt")
 
-    # Storing feasible objects AS NUMBERS
+    # Storing feasible objects
     store_feasible_objects('CLASPOutput.txt', myFeasibleObjects, myAttributes)
 
 
@@ -51,7 +51,7 @@ def parse_attributes_file(file_name, attributes):
 
 
 # Writes Hard Constraints in CNF format to feed to Clasp
-def write_to_cnf(constraints, file_name):
+def write_to_cnf_hard_constraints(constraints, file_name):
     output_file = open(file_name, "w")
     for line in constraints:
         output_file.write(line.output)
@@ -114,7 +114,7 @@ def parse_constraints_file(file_name, attributes, constraints):
         constraints[i].output += " 0\n"
 
     # Print out constraints output
-    write_to_cnf(constraints, "CNF.txt")
+    write_to_cnf_hard_constraints(constraints, "CNF.txt")
 
     # Close file stream
     input_file.close()
