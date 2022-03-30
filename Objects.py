@@ -37,8 +37,8 @@ class Possibilistic:
 
 class Feasible:
     def __init__(self):
-        self.num = 0
         self.name = ""
+        self.name_as_num = ''
         self.pen1 = 0
         self.pen2 = 0
         self.pen3 = 0
