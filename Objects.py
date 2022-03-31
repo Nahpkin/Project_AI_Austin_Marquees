@@ -28,6 +28,10 @@ class Penalty:
         self.input = ""
         self.output = ""
 
+class Penalty_Object:
+    def __init__(self):
+        self.feasible_object = ''
+
 class Possibilistic:
     def __init__(self):
         self.num = 0

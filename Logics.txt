@@ -1,7 +1,7 @@
 Penalty Logic:
 fish AND wine, 10
 wine OR cake, 6
-NOT wine AND beer OR beef AND NOT salad, 7
+NOT soup AND beer OR beef AND NOT cake, 7
 
 
 Possibilistic Logic:
