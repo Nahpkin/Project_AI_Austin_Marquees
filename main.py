@@ -13,11 +13,7 @@ def main():
     myPenalties = []
     myPossibilistics = []
     myQualitatives = []
-
     myFeasibleObjects = []
-    myFeasiblePenaltyObjects = []
-    myFeasiblePossObjects = []
-    myFeasibleQualObjects = []
     penalty_logic_file_list = []
     myFeasibleObject = []
 
@@ -40,14 +36,16 @@ def main():
     for index in range(len(myPenalties)):
         write_to_cnf_penalty_logic(myConstraints, myPenalties, myAttributes, index)
         os.system("clasp penalty_logic_input" + str(index) + ".txt -n 0 > CLASPOutputPenaltyTest" + str(index) + ".txt")
-        store_penalty_logic_results('CLASPOutputPenaltyTest' + str(index) + '.txt', myFeasiblePenaltyObjects, index)
+        store_penalty_logic_results('CLASPOutputPenaltyTest' + str(index) + '.txt', index, myAttributes, myPenalties)
 
 
     # Input for Possibilistic with CLASP
     for index in range(len(myPossibilistics)):
         write_to_cnf_possibilistic_logic(myConstraints, myPossibilistics, myAttributes, index)
-        os.system("clasp penalty_logic_input" + str(index) + ".txt -n 0 > CLASPOutputPossTest" + str(index) + ".txt")
+        os.system("clasp poss_logic_input" + str(index) + ".txt -n 0 > CLASPOutputPossTest" + str(index) + ".txt")
+        store_possibilistic_logic_results('CLASPOutputPossTest' + str(index) + '.txt', myPossibilistics, index)
 
+    # cross_reference_penalty(myFeasibleObjects, myPenalties)
 # ----------------------------------------------------------------------------------------------------------------------
 # Writing to input files:
 
@@ -65,7 +63,7 @@ def write_to_cnf_penalty_logic(hard_constraints, penalty_logic, attributes, inde
     output_file.write('p cnf ' + str(len(attributes)) + ' '
                       + str(len(hard_constraints)) + '\n')
 
-    output_file.write(penalty_logic[index].output)
+    output_file.write(penalty_logic[index].input_as_num)
     for line in hard_constraints:
         output_file.write(line.output)
 
@@ -76,7 +74,7 @@ def write_to_cnf_possibilistic_logic(hard_constraints, poss_logic, attributes, i
                       + str(len(hard_constraints)) + '\n')
     # print(penalty_logic[1].output)
     # output_file.write(penalty_logic[3].output)
-    for line in poss_logic[index].output:
+    for line in poss_logic[index].input_as_num:
         if line == '':
             continue
         else:
@@ -204,10 +202,6 @@ def parse_logic_file(file_name, penalties, possibilistics, qualitatives, attribu
         qual_input.append(Lines[i].split("\n"))
         i += 1
 
-    # For Testing
-    # print(pen_input)
-    # print(possib_input)
-    # print(qual_input)
 
     # Call parse functions to store Logics in respective Objects
     parse_penalty_logic(pen_input, penalties, attributes)
@@ -223,7 +217,7 @@ def parse_penalty_logic(pen_input, penalties, attributes):
         penalties.append(Penalty())
 
         # Split line into tokens
-        penalties[i].input = pen_input[i]
+        penalties[i].input_as_words = pen_input[i]
         tokens = re.split(r'[,]+', pen_input[i][0])
         penalties[i].pen = tokens[1]
         tokens = tokens[0].split(" ")
@@ -236,9 +230,9 @@ def parse_penalty_logic(pen_input, penalties, attributes):
                 while (tokens[j + 1] != attributes[k].op1) & (tokens[j + 1] != attributes[k].op2):
                     k += 1
                 if tokens[j + 1] == attributes[k].op1:
-                    penalties[i].output += str(attributes[k].numop2) + " "
+                    penalties[i].input_as_num += str(attributes[k].numop2) + " "
                 if tokens[j + 1] == attributes[k].op2:
-                    penalties[i].output += str(attributes[k].numop1) + " "
+                    penalties[i].input_as_num += str(attributes[k].numop1) + " "
                 j += 2
                 continue
             # Case: OR condition
@@ -251,7 +245,7 @@ def parse_penalty_logic(pen_input, penalties, attributes):
                 break
                 # Case: AND condition
             elif tokens[j] == "AND":
-                penalties[i].output += "0\n"
+                penalties[i].input_as_num += "0\n"
                 j += 1
                 continue
             else:
@@ -260,16 +254,12 @@ def parse_penalty_logic(pen_input, penalties, attributes):
                     # Iterative variable
                     k += 1
                 if tokens[j] == attributes[k].op1:
-                    penalties[i].output += str(attributes[k].numop1) + " "
+                    penalties[i].input_as_num += str(attributes[k].numop1) + " "
                 if tokens[j] == attributes[k].op2:
-                    penalties[i].output += str(attributes[k].numop2) + " "
+                    penalties[i].input_as_num += str(attributes[k].numop2) + " "
             # Iterative variable
             j += 1
         i += 1
-
-   # for pen in penalties:
-       # print(pen.output + pen_pen)
-
 
 
 def parse_possibilistic_logic(possib_input, possibilistics, attributes):
@@ -280,7 +270,7 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
         possibilistics.append(Possibilistic())
 
         # Split line into tokens
-        possibilistics[i].input = possib_input[i]
+        possibilistics[i].input_as_words = possib_input[i]
         tokens = re.split(r'[,]+', possib_input[i][0])
         possibilistics[i].tol = tokens[1]
         tokens = tokens[0].split(" ")
@@ -293,9 +283,9 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
                 while (tokens[j + 1] != attributes[k].op1) & (tokens[j + 1] != attributes[k].op2):
                     k += 1
                 if tokens[j + 1] == attributes[k].op1:
-                    possibilistics[i].output += str(attributes[k].numop2) + " "
+                    possibilistics[i].input_as_num += str(attributes[k].numop2) + " "
                 if tokens[j + 1] == attributes[k].op2:
-                    possibilistics[i].output += str(attributes[k].numop1) + " "
+                    possibilistics[i].input_as_num += str(attributes[k].numop1) + " "
                 j += 2
                 continue
             # Case: OR condition
@@ -308,7 +298,7 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
                 break
                 # Case: AND condition
             elif tokens[j] == "AND":
-                possibilistics[i].output += "0\n"
+                possibilistics[i].input_as_num += "0\n"
                 j += 1
                 continue
             else:
@@ -317,15 +307,13 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
                     # Iterative variable
                     k += 1
                 if tokens[j] == attributes[k].op1:
-                    possibilistics[i].output += str(attributes[k].numop1) + " "
+                    possibilistics[i].input_as_num += str(attributes[k].numop1) + " "
                 if tokens[j] == attributes[k].op2:
-                    possibilistics[i].output += str(attributes[k].numop2) + " "
+                    possibilistics[i].input_as_num += str(attributes[k].numop2) + " "
             # Iterative variable
             j += 1
         i += 1
 
-
-# ----------------------------------------------------------------------------------------------------------------------
 
 # TODO: Last thing that we will do
 def parse_qualitative_logic(qual_input, qualitatives, attributes):
@@ -339,7 +327,9 @@ def parse_qualitative_logic(qual_input, qualitatives, attributes):
         qualitatives[i].input = qual_input[i][0]
         tokens = qual_input[i][0].split(" ")
         i += 1
-        
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Stores feasible objects given by CLASP in Object Feasible Format
 def store_feasible_objects(file_name, feasible_objects, attributes):
@@ -371,32 +361,47 @@ def store_feasible_objects(file_name, feasible_objects, attributes):
             attribute_index += 1
         object.name += '>'
 
-# TODO: Not done
-def store_penalty_logic_results(file_name, penalty_object_list, index):
+
+# Stores objects from output with penalty logic
+def store_penalty_logic_results(file_name, index, attributes, penalty_list):
     clasp_output = open(file_name, 'r')
 
-    method_index = 0
     for line in clasp_output.readlines():
-        if line[0] is 'v':
-            penalty_object_list.append(Penalty_Object())
+        if line[0] == 'v':
             line = line.split('v ')
             line.remove(line[0])
             line = line[0].split(' 0\n')
-            penalty_object_list[method_index].feasible_object = line[0]
-            method_index += 1
+            penalty_list[index].output_as_num.append(line[0])
 
 
 
-    print(penalty_object_list[index].input)
-    print(penalty_object_list[index].output)
-    print(penalty_object_list[index].pen)
-    print('\n\n\n')
+# Store objects from output with possibilistic logic
+def store_possibilistic_logic_results(file_name, poss_list, index):
+    clasp_output = open(file_name, 'r')
 
+    for line in clasp_output.readlines():
+        if line[0] == 'v':
+            line = line.split('v ')
+            line.remove(line[0])
+            line = line[0].split(' 0\n')
+            poss_list[index].output_as_num.append(line[0])
 
 # ----------------------------------------------------------------------------------------------------------------------
-# def cross_reference(hard_constraints, )
+# def cross_reference_penalty(feasible_objects_list, penalty_list):
+#     for penalty in penalty_list:
+#         print(penalty.pen)
+#     for index in range(len(feasible_objects_list)):
+#         for penalty in penalty_list:
+#             print(penalty.pen)
+#             if feasible_objects_list[index].name_as_num == penalty.output_as_num:
+#                 feasible_objects_list[index].penalty_list.append(0)
+#             else:
+#                 feasible_objects_list[index].penalty_list.append(int(penalty.pen))
 
+    # for penalty_object in feasible_objects_list:
+    #     print(penalty_object.penalty_list)
 
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Call main
 main()
