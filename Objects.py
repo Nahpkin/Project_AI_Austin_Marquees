@@ -52,3 +52,9 @@ class Feasible:
         self.possib3 = 0
         self.possib_total = 0
 
+class Qualitative:
+    def __init__(self):
+        self.num = 0
+        self.input = ""
+        self.output = ""
+

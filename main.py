@@ -2,6 +2,7 @@ import os
 import platform
 from Objects import *
 import re
+from PyGUI import *
 
 
 # Main method
@@ -12,11 +13,14 @@ def main():
     myPenalties = []
     myPossibilistics = []
     myQualitatives = []
+
     myFeasibleObjects = []
     myFeasiblePenaltyObjects = []
     myFeasiblePossObjects = []
     myFeasibleQualObjects = []
     penalty_logic_file_list = []
+    myFeasibleObject = []
+
 
     # Parsing methods for files given
     parse_attributes_file("Attributes.txt", myAttributes)
@@ -25,6 +29,9 @@ def main():
 
     # Call Clasp and write to file
     os.system("clasp CNF.txt -n 0 > CLASPOutput.txt")
+
+    # Call PyGUI
+    PyGUI(myAttributes, myConstraints, myPenalties, myPossibilistics, myQualitatives)
 
     # Storing feasible objects
     store_feasible_objects('CLASPOutput.txt', myFeasibleObjects, myAttributes)
@@ -101,6 +108,8 @@ def parse_attributes_file(file_name, attributes):
 
         # Iterate variable
         i += 1
+
+    # Close input file stream
     input_file.close()
 
 
@@ -159,12 +168,13 @@ def parse_constraints_file(file_name, attributes, constraints):
         # Add a new line to output
         constraints[i].output += " 0\n"
 
+        i += 1
+
     # Print out constraints output
     write_to_cnf_hard_constraints(constraints, "CNF.txt", attributes)
 
     # Close file stream
     input_file.close()
-
 
 # Parses Logic file to save into Object lists
 def parse_logic_file(file_name, penalties, possibilistics, qualitatives, attributes):
@@ -194,12 +204,15 @@ def parse_logic_file(file_name, penalties, possibilistics, qualitatives, attribu
         qual_input.append(Lines[i].split("\n"))
         i += 1
 
+    # For Testing
+    # print(pen_input)
+    # print(possib_input)
+    # print(qual_input)
 
     # Call parse functions to store Logics in respective Objects
     parse_penalty_logic(pen_input, penalties, attributes)
     parse_possibilistic_logic(possib_input, possibilistics, attributes)
-    # parse_qualitative_logic(qual_input, qualitatives)
-
+    parse_qualitative_logic(qual_input, qualitatives, attributes)
 
 # Parses penalty logic into Object Penalty format
 def parse_penalty_logic(pen_input, penalties, attributes):
@@ -214,7 +227,6 @@ def parse_penalty_logic(pen_input, penalties, attributes):
         tokens = re.split(r'[,]+', pen_input[i][0])
         penalties[i].pen = tokens[1]
         tokens = tokens[0].split(" ")
-
 
         j = 0
         while j < len(tokens):
@@ -255,8 +267,11 @@ def parse_penalty_logic(pen_input, penalties, attributes):
             j += 1
         i += 1
 
+   # for pen in penalties:
+       # print(pen.output + pen_pen)
 
-# Parses possibilistic logic in Object Possibilistic Format
+
+
 def parse_possibilistic_logic(possib_input, possibilistics, attributes):
     i = 1
     possibilistics.append(Possibilistic())
@@ -269,7 +284,6 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
         tokens = re.split(r'[,]+', possib_input[i][0])
         possibilistics[i].tol = tokens[1]
         tokens = tokens[0].split(" ")
-
 
         j = 0
         while j < len(tokens):
@@ -310,7 +324,23 @@ def parse_possibilistic_logic(possib_input, possibilistics, attributes):
             j += 1
         i += 1
 
+
 # ----------------------------------------------------------------------------------------------------------------------
+
+# TODO: Last thing that we will do
+def parse_qualitative_logic(qual_input, qualitatives, attributes):
+    i = 1
+    qualitatives.append(Qualitative())
+    while i < len(qual_input):
+        # Add new Penalty object to list
+        qualitatives.append(Qualitative())
+
+        # Split line into tokens
+        qualitatives[i].input = qual_input[i][0]
+        tokens = qual_input[i][0].split(" ")
+        i += 1
+        
+
 # Stores feasible objects given by CLASP in Object Feasible Format
 def store_feasible_objects(file_name, feasible_objects, attributes):
     clasp_output = open(file_name, 'r')
@@ -365,8 +395,6 @@ def store_penalty_logic_results(file_name, penalty_object_list, index):
 
 # ----------------------------------------------------------------------------------------------------------------------
 # def cross_reference(hard_constraints, )
-
-
 
 
 
