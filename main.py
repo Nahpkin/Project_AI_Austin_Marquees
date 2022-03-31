@@ -51,12 +51,19 @@ def parse_attributes_file(file_name, attributes):
 
 
 # Writes Hard Constraints in CNF format to feed to Clasp
-def write_to_cnf_hard_constraints(constraints, file_name):
+def write_to_cnf_hard_constraints(constraints, file_name, attributes):
     output_file = open(file_name, "w")
+    output_file.write("p cnf " + str(len(attributes)) + " " + str(len(constraints)) + "\n")
     for line in constraints:
         output_file.write(line.output)
     output_file.close()
 
+def write_to_cnf_penalty_logic(hard_constraints, penalty_logic, attributes):
+    output_file = open('penalty_logic_input.txt', 'w')
+    output_file.write('p cnf ' + str(len(attributes)) + ' '
+                      + str(len(hard_constraints) + len(penalty_logic)) + '\n')
+    for line in constraints:
+        output_file.write(line)
 
 # Parses the Hard Constraints file from Words to Binary Logic(Stored in list of Constraint objects)
 def parse_constraints_file(file_name, attributes, constraints):
@@ -67,7 +74,7 @@ def parse_constraints_file(file_name, attributes, constraints):
     # Start parsing the file
     # Add "p cnf" header to CNF output
     constraints.append(Constraint())
-    constraints[0].output = "p cnf " + str(len(attributes)) + " " + str(len(Lines)) + "\n"
+    # constraints[0].output = "p cnf " + str(len(attributes)) + " " + str(len(Lines)) + "\n"
     # Body of CNF file
     i = 0
     for line in Lines:
@@ -114,7 +121,7 @@ def parse_constraints_file(file_name, attributes, constraints):
         constraints[i].output += " 0\n"
 
     # Print out constraints output
-    write_to_cnf_hard_constraints(constraints, "CNF.txt")
+    write_to_cnf_hard_constraints(constraints, "CNF.txt", attributes)
 
     # Close file stream
     input_file.close()
