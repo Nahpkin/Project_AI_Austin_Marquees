@@ -1,5 +1,5 @@
 c clasp version 3.3.6
-c Reading from penalty_logic_input1.txt
+c Reading from CLASPInputs/penalty_logic_input0.txt
 c Solving...
 s UNSATISFIABLE
 c 

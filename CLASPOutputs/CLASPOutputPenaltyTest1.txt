@@ -1,5 +1,5 @@
 c clasp version 3.3.6
-c Reading from penalty_logic_input2.txt
+c Reading from CLASPInputs/penalty_logic_input1.txt
 c Solving...
 c Answer: 1
 v -1 2 -3 4 0
@@ -13,5 +13,5 @@ s SATISFIABLE
 c 
 c Models         : 4
 c Calls          : 1
-c Time           : 0.001s (Solving: 0.00s 1st Model: 0.00s Unsat: 0.00s)
+c Time           : 0.000s (Solving: 0.00s 1st Model: 0.00s Unsat: 0.00s)
 c CPU Time       : 0.000s
