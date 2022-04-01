@@ -475,6 +475,3 @@ def cross_reference_poss(feasible_objects_list, poss_list):
         for tolerance in feasible_object.poss_list:
             if tolerance < feasible_object.tolerance:
                 feasible_object.tolerance = tolerance
-        print(feasible_object.name_as_num)
-        print(feasible_object.poss_list)
-        print(feasible_object.tolerance)
