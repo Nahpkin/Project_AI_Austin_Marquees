@@ -1,5 +1,5 @@
 c clasp version 3.3.6
-c Reading from CNF.txt
+c Reading from poss_logic_input0.txt
 c Solving...
 c Answer: 1
 v -1 2 -3 4 0

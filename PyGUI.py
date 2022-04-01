@@ -2,20 +2,32 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 from tkinter import filedialog as fd
-
+from Backend import *
+import re
+import os
+import platform
+from Objects import *
 
 
 class PyGUI:
-    def __init__(self, attributes, constraints, penalties, possibilistics, qualitatives):
+    def __init__(self):
         # Make and name TK GUI
         self.root = Tk()
         self.root.title("Project 3 AI")
 
-        self.attributes = attributes
-        self.constraints = constraints
-        self.penalties = penalties
-        self.possibilistics = possibilistics
-        self.qualitatives = qualitatives
+        self.button_pressed = ""
+        self.attr_file = ""
+        self.con_file = ""
+        self.logics_file = ""
+        self.files = []
+
+        self.attributes = []
+        self.constraints = []
+        self.Logics = []
+        self.penalties = []
+        self.possibilistics = []
+        self.qualitatives = []
+
 
         # Create tab controller
         self.tab_notebook = ttk.Notebook(self.root)
@@ -28,9 +40,7 @@ class PyGUI:
         self.make_opti_tab()
         self.make_omni_tab()
 
-        # Main loop for GUI
         self.root.mainloop()
-
 
     # Displays Binary Attributes values
     def display_attributes(self):
@@ -49,29 +59,52 @@ class PyGUI:
     # Displays Penalty Logic variables
     def display_penalty(self):
         i = 1
-        p = self.penalties
+        p = self.Logics[0]
         while i < len(p):
-            self.tree_pen.insert(parent='', index='end', iid=i, values=(i, p[i].input[0], p[i].pen))
+            self.tree_pen.insert(parent='', index='end', iid=i, values=(i, p[i].input_as_words[0], p[i].pen))
             i += 1
 
     # Displays Possibilistic Logic variables
     def display_possibilistic(self):
         i = 1
-        p = self.possibilistics
+        p = self.Logics[1]
         while i < len(p):
-            self.tree_possib.insert(parent='', index='end', iid=i, values=(i, p[i].input[0], p[i].tol))
+            self.tree_possib.insert(parent='', index='end', iid=i, values=(i, p[i].input_as_words[0], p[i].tol))
             i += 1
 
     # Displays Qualitative Form Logic variables
     def display_qualitative(self):
         i = 1
-        while i < len(self.qualitatives):
+        while i < len(self.Logics[2]):
             self.tree_qual.insert(parent='', index='end', iid=i, values=(i, self.qualitatives[i].input))
             i += 1
 
-    def callback(self):
-        name = fd.askopenfilename()
-        print(name)
+    def call_parse_attributes(self):
+        self.attr_file = fd.askopenfilename()
+        self.attributes = parse_attributes_file(self.attr_file, self.attributes)
+        self.files.append(self.attr_file)
+        self.display_attributes()
+        self.button_con['state'] = NORMAL
+
+    def call_parse_constraints(self):
+        self.con_file = fd.askopenfilename()
+        self.constraints = parse_constraints_file(self.con_file, self.attributes, self.constraints)
+        self.files.append(self.con_file)
+        self.display_constraints()
+        self.button_logic['state'] = NORMAL
+
+    def call_parse_logics(self):
+        self.logics_file = fd.askopenfilename()
+        self.Logics = parse_logic_file(self.logics_file,
+                                       self.penalties,
+                                       self.possibilistics,
+                                       self.qualitatives,
+                                       self.attributes)
+        self.display_penalty()
+        self.display_possibilistic()
+        self.display_qualitative()
+        self.files.append(self.logics_file)
+        Backend(self.files)
 
 
     # Create page for all input variables
@@ -112,7 +145,7 @@ class PyGUI:
         self.tree_attr.pack()
 
         # Make button to open attribute Files
-        self.button_attr = tk.Button(self.frm_left, text='Open File', command=self.callback)
+        self.button_attr = tk.Button(self.frm_left, text='Open File', command=self.call_parse_attributes)
         self.button_attr.pack()
 
         # Constraints Label
@@ -133,6 +166,13 @@ class PyGUI:
         # Show tree
         self.tree_con.pack()
 
+        # Make button to open constraint Files
+        self.button_con = tk.Button(self.frm_left,
+                                    text='Open File',
+                                    command=self.call_parse_constraints,
+                                    state=DISABLED)
+        self.button_con.pack()
+
         # Penalty Logic Label
         self.lbl_pen = Label(self.frm_right, text="Penalty Logic")
         self.lbl_pen.pack()
@@ -152,6 +192,7 @@ class PyGUI:
 
         # Show tree
         self.tree_pen.pack()
+
 
         # Possibilistic Logic Label
         self.lbl_possib = Label(self.frm_right, text="Possibilistic Logic")
@@ -191,12 +232,10 @@ class PyGUI:
         # Show tree
         self.tree_qual.pack()
 
-        # Read and Display to TreeView widgets
-        self.display_attributes()
-        self.display_constraints()
-        self.display_penalty()
-        self.display_possibilistic()
-        self.display_qualitative()
+        # Make button to open Logic Files
+        self.button_logic = tk.Button(self.frm_right, text='Open File', command=self.call_parse_logics, state=DISABLED)
+        self.button_logic.pack()
+
 
     # Create Page for Feasible objects
     def make_exist_tab(self):
