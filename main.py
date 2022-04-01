@@ -34,43 +34,59 @@ def main():
 
     # Input for Penalty Logic with CLASP
     for index in range(len(myPenalties)):
+        # Building and writing to input file for CLASP
         built_string = write_to_cnf_penalty_logic(myConstraints, myPenalties, index)
         add_beginning_of_clasp_penalty_statement(myAttributes, index, built_string)
 
+        # Running CLASP
         os.system("clasp penalty_logic_input" + str(index) + ".txt -n 0 > CLASPOutputPenaltyTest" + str(index) + ".txt")
 
+        # Storing results
         store_penalty_logic_results('CLASPOutputPenaltyTest' + str(index) + '.txt', index, myAttributes, myPenalties)
 
 
     # Input for Possibilistic with CLASP
     for index in range(len(myPossibilistics)):
-        built_string = write_to_cnf_possibilistic_logic(myConstraints, myPossibilistics, myAttributes, index)
+        # Building and writing to input file for CLASP
+        built_string = write_to_cnf_possibilistic_logic(myConstraints, myPossibilistics, index)
         add_beginning_of_clasp_poss_statement(myAttributes, index, built_string)
 
+        # Running CLASP
         os.system("clasp poss_logic_input" + str(index) + ".txt -n 0 > CLASPOutputPossTest" + str(index) + ".txt")
+
+        # Storing results
         store_possibilistic_logic_results('CLASPOutputPossTest' + str(index) + '.txt', myPossibilistics, index)
 
+    # Cross-referencing feasible objects to apply penalty
     cross_reference_penalty(myFeasibleObjects, myPenalties)
 # ----------------------------------------------------------------------------------------------------------------------
 # Writing to input files:
-
-# Writes Hard Constraints in CNF format to feed to Clasp
-def write_to_cnf_hard_constraints(constraints, file_name, attributes):
-    output_file = open(file_name, "w")
-    output_file.write("p cnf " + str(len(attributes)) + " " + str(len(constraints)) + "\n")
+def write_to_cnf_hard_constraints(constraints):
+    string_builder = ''
     for line in constraints:
-        output_file.write(line.output)
+        string_builder += line.output
+
+    return string_builder
+
+def add_beginning_of_clasp_constraints_statement(file_name, built_string, attributes):
+    output_file = open(file_name, "w")
+    test = built_string.split('\n')
+    string_builder = ''
+
+
+    clause_counter = 0
+    for line in test:
+        if line == '':
+            clause_counter -= 1
+        clause_counter += 1
+
+    string_builder += "p cnf " + str(len(attributes)) + " " + str(clause_counter) + "\n" + built_string
+    output_file.write(string_builder)
     output_file.close()
 
-
 def write_to_cnf_penalty_logic(hard_constraints, penalty_logic, index):
-    # output_file = open('penalty_logic_input' + str(index) + '.txt', 'w')
-    # output_file.write('p cnf ' + str(len(attributes)) + ' '
-    #                   + str(len(hard_constraints)) + '\n')
-
-    # output_file.write(penalty_logic[index].input_as_num)
-
     string_build = penalty_logic[index].input_as_num
+
     for line in hard_constraints:
         string_build += line.output
 
@@ -89,22 +105,11 @@ def add_beginning_of_clasp_penalty_statement(attributes, index, built_string):
     string_builder = built_string
     string_builder = 'p cnf ' + str(len(attributes)) + ' ' + str(clause_counter) + '\n' + string_builder
     output_file.write(string_builder)
+    output_file.close()
 
-def write_to_cnf_possibilistic_logic(hard_constraints, poss_logic, attributes, index):
-    # output_file = open('poss_logic_input' + str(index) + '.txt', 'w')
-    # output_file.write('p cnf ' + str(len(attributes)) + ' '
-    #                   + str(len(hard_constraints)) + '\n')
-    # print(penalty_logic[1].output)
-    # output_file.write(penalty_logic[3].output)
-    # for line in poss_logic[index].input_as_num:
-    #     if line == '':
-    #         continue
-    #     else:
-    #         output_file.write(line)
-    # for line in hard_constraints:
-    #     output_file.write(line.output)
-
+def write_to_cnf_possibilistic_logic(hard_constraints, poss_logic, index):
     string_build = poss_logic[index].input_as_num
+
     for line in hard_constraints:
         string_build += line.output
 
@@ -123,6 +128,7 @@ def add_beginning_of_clasp_poss_statement(attributes, index, built_string):
     string_builder = built_string
     string_builder = 'p cnf ' + str(len(attributes)) + ' ' + str(clause_counter) + '\n' + string_builder
     output_file.write(string_builder)
+    output_file.close()
 # ----------------------------------------------------------------------------------------------------------------------
 # Parsing files from user:
 
@@ -210,7 +216,8 @@ def parse_constraints_file(file_name, attributes, constraints):
         i += 1
 
     # Print out constraints output
-    write_to_cnf_hard_constraints(constraints, "CNF.txt", attributes)
+    built_string = write_to_cnf_hard_constraints(constraints)
+    add_beginning_of_clasp_constraints_statement("CNF.txt", built_string, attributes)
 
     # Close file stream
     input_file.close()
@@ -370,8 +377,6 @@ def parse_qualitative_logic(qual_input, qualitatives, attributes):
         qualitatives[i].input = qual_input[i][0]
         tokens = qual_input[i][0].split(" ")
         i += 1
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Stores feasible objects given by CLASP in Object Feasible Format
@@ -415,6 +420,8 @@ def store_penalty_logic_results(file_name, index, attributes, penalty_list):
             line.remove(line[0])
             line = line[0].split(' 0\n')
             penalty_list[index].output_as_num.append(line[0])
+        if line[0] == 's' and line[3] == 'U':
+            penalty_list[index].output_as_num.append('')
 
 
 
@@ -430,6 +437,7 @@ def store_possibilistic_logic_results(file_name, poss_list, index):
             poss_list[index].output_as_num.append(line[0])
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Not working yet
 def cross_reference_penalty(feasible_objects_list, penalty_list):
     penalty_list.remove(penalty_list[0])
     # for penalty in penalty_list:
