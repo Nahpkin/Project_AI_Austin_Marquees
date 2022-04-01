@@ -32,13 +32,6 @@ class Penalty:
         self.output_as_words = ''
         self.output_as_num = []
 
-# class Penalty_Object:
-#     def __init__(self):
-#         self.logic_statement = ''
-#         self.feasible_object_as_num = ''
-#         self.feasible_object = ''       # FixMe: Not sure if this is necessary
-#         self.penalty = 0
-
 
 class Possibilistic:
     def __init__(self):
@@ -58,14 +51,10 @@ class Feasible:
     def __init__(self):
         self.name = ""
         self.name_as_num = ''
-        self.penalty_list = []
-        self.pen2 = 0
-        self.pen3 = 0
+        self.penalty_list = None
         self.pen_total = 0
-        self.possib1 = 0
-        self.possib2 = 0
-        self.possib3 = 0
-        self.possib_total = 0
+        self.poss_list = None
+        self.tolerance = 1
 
 class Qualitative:
     def __init__(self):

@@ -13,7 +13,6 @@ def Backend(files):
     myPossibilistics = []
     myQualitatives = []
     myFeasibleObjects = []
-    penalty_logic_file_list = []
     myFeasibleObject = []
 
     # Parsing methods for files given
@@ -24,8 +23,6 @@ def Backend(files):
     # Call Clasp and write to file
     os.system("clasp CNF.txt -n 0 > CLASPOutput.txt")
 
-    # Call PyGUI
-    # PyGUI(myAttributes, myConstraints, myPenalties, myPossibilistics, myQualitatives)
 
     # Storing feasible objects
     store_feasible_objects('CLASPOutput.txt', myFeasibleObjects, myAttributes)
@@ -37,10 +34,11 @@ def Backend(files):
         add_beginning_of_clasp_penalty_statement(myAttributes, index, built_string)
 
         # Running CLASP
-        os.system("clasp CLASPInputs/penalty_logic_input" + str(index) + ".txt -n 0 > CLASPOutputs/CLASPOutputPenaltyTest" + str(index) + ".txt")
+        os.system("clasp penalty_logic_input"
+                  + str(index) + ".txt -n 0 > CLASP_Output_Penalty_Test" + str(index) + ".txt")
 
         # Storing results
-        store_penalty_logic_results('CLASPOutputs/CLASPOutputPenaltyTest' + str(index) + '.txt', index, myAttributes, myPenalties)
+        store_penalty_logic_results('CLASP_Output_Penalty_Test' + str(index) + '.txt', index, myPenalties)
 
     # Input for Possibilistic with CLASP
     for index in range(len(myPossibilistics)):
@@ -49,13 +47,15 @@ def Backend(files):
         add_beginning_of_clasp_poss_statement(myAttributes, index, built_string)
 
         # Running CLASP
-        os.system("clasp CLASPInputs/poss_logic_input" + str(index) + ".txt -n 0 > CLASPOutputs/CLASPOutputPossTest" + str(index) + ".txt")
+        os.system("clasp poss_logic_input" + str(index) + ".txt -n 0 > CLASP_Output_Poss_Test" + str(index)
+                  + ".txt")
 
         # Storing results
-        store_possibilistic_logic_results('CLASPOutputs/CLASPOutputPossTest' + str(index) + '.txt', myPossibilistics, index)
+        store_possibilistic_logic_results('CLASP_Output_Poss_Test' + str(index) + '.txt', myPossibilistics, index)
 
     # Cross-referencing feasible objects to apply penalty
     cross_reference_penalty(myFeasibleObjects, myPenalties)
+    cross_reference_poss(myFeasibleObjects, myPossibilistics)
 # ----------------------------------------------------------------------------------------------------------------------
 # Writing to input files:
 def write_to_cnf_hard_constraints(constraints):
@@ -64,7 +64,6 @@ def write_to_cnf_hard_constraints(constraints):
         string_builder += line.output
 
     return string_builder
-
 
 def add_beginning_of_clasp_constraints_statement(file_name, built_string, attributes):
     output_file = open(file_name, "w")
@@ -81,7 +80,6 @@ def add_beginning_of_clasp_constraints_statement(file_name, built_string, attrib
     output_file.write(string_builder)
     output_file.close()
 
-
 def write_to_cnf_penalty_logic(hard_constraints, penalty_logic, index):
     string_build = penalty_logic[index].input_as_num
 
@@ -90,9 +88,8 @@ def write_to_cnf_penalty_logic(hard_constraints, penalty_logic, index):
 
     return string_build
 
-
 def add_beginning_of_clasp_penalty_statement(attributes, index, built_string):
-    output_file = open('CLASPInputs/penalty_logic_input' + str(index) + '.txt', 'w')
+    output_file = open('penalty_logic_input' + str(index) + '.txt', 'w')
     test = built_string.split('\n')
 
     clause_counter = 0
@@ -105,7 +102,6 @@ def add_beginning_of_clasp_penalty_statement(attributes, index, built_string):
     string_builder = 'p cnf ' + str(len(attributes)) + ' ' + str(clause_counter) + '\n' + string_builder
     output_file.write(string_builder)
     output_file.close()
-
 
 def write_to_cnf_possibilistic_logic(hard_constraints, poss_logic, index):
     string_build = poss_logic[index].input_as_num
@@ -115,9 +111,8 @@ def write_to_cnf_possibilistic_logic(hard_constraints, poss_logic, index):
 
     return string_build
 
-
 def add_beginning_of_clasp_poss_statement(attributes, index, built_string):
-    output_file = open('CLASPInputs/penalty_logic_input' + str(index) + '.txt', 'w')
+    output_file = open('poss_logic_input' + str(index) + '.txt', 'w')
     test = built_string.split('\n')
 
     clause_counter = 0
@@ -130,12 +125,11 @@ def add_beginning_of_clasp_poss_statement(attributes, index, built_string):
     string_builder = 'p cnf ' + str(len(attributes)) + ' ' + str(clause_counter) + '\n' + string_builder
     output_file.write(string_builder)
     output_file.close()
-    # ----------------------------------------------------------------------------------------------------------------------
-    # Parsing files from user:
 
-    # Parses the Attributes file from Words to Binary Logic (Stored in list of Attribute objects)
+
 # ----------------------------------------------------------------------------------------------------------------------
-
+# Parsing files from user:
+# Parses the Attributes file from Words to Binary Logic (Stored in list of Attribute objects)
 def parse_attributes_file(file_name, attributes):
     # Open file pointer to read lines
     input_file = open(file_name, "r")
@@ -226,9 +220,8 @@ def parse_constraints_file(file_name, attributes, constraints):
     # Close file stream
     input_file.close()
     return constraints
-    # Parses Logic file to save into Object lists
 
-
+# Parses Logic file to save into Object lists
 def parse_logic_file(file_name, penalties, possibilistics, qualitatives, attributes):
     # Open and read file lines
     input_file = open(file_name, "r")
@@ -393,9 +386,9 @@ def parse_qualitative_logic(qual_input, qualitatives, attributes):
     return qualitatives
     # ----------------------------------------------------------------------------------------------------------------------
 
-    # Stores feasible objects given by CLASP in Object Feasible Format
-# ----------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Stores feasible objects given by CLASP in Object Feasible Format
 def store_feasible_objects(file_name, feasible_objects, attributes):
     clasp_output = open(file_name, 'r')
 
@@ -425,10 +418,8 @@ def store_feasible_objects(file_name, feasible_objects, attributes):
             attribute_index += 1
         object.name += '>'
 
-    # Stores objects from output with penalty logic
-
-
-def store_penalty_logic_results(file_name, index, attributes, penalty_list):
+# Stores objects from output with penalty logic
+def store_penalty_logic_results(file_name, index, penalty_list):
     clasp_output = open(file_name, 'r')
 
     for line in clasp_output.readlines():
@@ -440,9 +431,7 @@ def store_penalty_logic_results(file_name, index, attributes, penalty_list):
         if line[0] == 's' and line[2] == 'U':
             penalty_list[index].output_as_num.append('')
 
-    # Store objects from output with possibilistic logic
-
-
+# Store objects from output with possibilistic logic
 def store_possibilistic_logic_results(file_name, poss_list, index):
     clasp_output = open(file_name, 'r')
 
@@ -455,19 +444,37 @@ def store_possibilistic_logic_results(file_name, poss_list, index):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-# Not working yet
+# Cross-Referencing Feasible Objects and Objects from CLASP To Apply Penalty
 def cross_reference_penalty(feasible_objects_list, penalty_list):
-    index_1 = 0
+    for outer_index in range(len(feasible_objects_list)):
+        feasible_objects_list[outer_index].penalty_list = [0] * len(penalty_list)
+        for middle_index in range(len(penalty_list)):
+            for inner_index in range(len(penalty_list[middle_index].output_as_num)):
+                if (feasible_objects_list[outer_index].name_as_num ==
+                        penalty_list[middle_index].output_as_num[inner_index]):
+                    feasible_objects_list[outer_index].penalty_list[middle_index] = 0
+                    break
+                feasible_objects_list[outer_index].penalty_list[middle_index] = int(penalty_list[middle_index].pen)
+
     for feasible_object in feasible_objects_list:
-        for penalty in penalty_list:
-            count = 0
-            for index in penalty.output_as_num:
-                if feasible_object.name_as_num == index:
-                    feasible_object.penalty_list.append(0)
-                else:
-                    feasible_object.penalty_list.append(int(penalty.pen))
-                    # feasible_object.penalty_list.append(1)
-        index_1 += 1
-    for f in feasible_objects_list:
-        print(f.penalty_list)
-        print(f.name_as_num)
+        for penalty in feasible_object.penalty_list:
+            feasible_object.pen_total += penalty
+
+# Cross-Reference Feasible Objects and Objects from CLASP to Apply Tolerance
+def cross_reference_poss(feasible_objects_list, poss_list):
+    for outer_index in range(len(feasible_objects_list)):
+        feasible_objects_list[outer_index].poss_list = [1] * len(poss_list)
+        for middle_index in range(len(poss_list)):
+            for inner_index in range(len(poss_list[middle_index].output_as_num)):
+                if feasible_objects_list[outer_index].name_as_num == poss_list[middle_index].output_as_num[inner_index]:
+                    feasible_objects_list[outer_index].poss_list[middle_index] = 1
+                    break
+                feasible_objects_list[outer_index].poss_list[middle_index] = 1 - float(poss_list[middle_index].tol)
+
+    for feasible_object in feasible_objects_list:
+        for tolerance in feasible_object.poss_list:
+            if tolerance < feasible_object.tolerance:
+                feasible_object.tolerance = tolerance
+        print(feasible_object.name_as_num)
+        print(feasible_object.poss_list)
+        print(feasible_object.tolerance)
