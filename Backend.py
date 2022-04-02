@@ -479,7 +479,7 @@ def cross_reference_poss(feasible_objects_list, poss_list):
                 if feasible_objects_list[outer_index].name_as_num == poss_list[middle_index].output_as_num[inner_index]:
                     feasible_objects_list[outer_index].poss_list[middle_index] = 1
                     break
-                feasible_objects_list[outer_index].poss_list[middle_index] = 1 - float(poss_list[middle_index].tol)
+                feasible_objects_list[outer_index].poss_list[middle_index] = round(1 - float(poss_list[middle_index].tol), 2)
 
     for feasible_object in feasible_objects_list:
         for tolerance in feasible_object.poss_list:
