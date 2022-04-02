@@ -2,6 +2,7 @@ import os
 import platform
 from Objects import *
 import re
+import random
 
 
 # Main method
@@ -55,8 +56,13 @@ def Backend(files):
     # Cross-referencing feasible objects to apply penalty
     cross_reference_penalty(myFeasibleObjects, myPenalties)
     cross_reference_poss(myFeasibleObjects, myPossibilistics)
+    
+     # Exemplification
+    exemplification(myFeasibleObjects)
 
+    # Return FeasibleObjects to be called by PyGUI
     return myFeasibleObjects
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Writing to input files:
 def write_to_cnf_hard_constraints(constraints):
@@ -385,7 +391,6 @@ def parse_qualitative_logic(qual_input, qualitatives, attributes):
         i += 1
     qualitatives.remove(qualitatives[0])
     return qualitatives
-    # ----------------------------------------------------------------------------------------------------------------------
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -445,8 +450,8 @@ def store_possibilistic_logic_results(file_name, poss_list, index):
             line = line[0].split(' 0\n')
             poss_list[index].output_as_num.append(line[0])
 
-# ----------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
 # Cross-Referencing Feasible Objects and Objects from CLASP To Apply Penalty
 def cross_reference_penalty(feasible_objects_list, penalty_list):
     for outer_index in range(len(feasible_objects_list)):
@@ -481,4 +486,29 @@ def cross_reference_poss(feasible_objects_list, poss_list):
             if tolerance < feasible_object.tolerance:
                 feasible_object.tolerance = tolerance
 
+
     return feasible_objects_list
+
+# ----------------------------------------------------------------------------------------------------------------------
+def exemplification(feasible_objects_list):
+
+    random_object_1 = feasible_objects_list[random.randint(0, len(feasible_objects_list) - 1)]
+    random_object_2 = feasible_objects_list[random.randint(0, len(feasible_objects_list) - 1)]
+    if random_object_1 == random_object_2:
+        random_object_2 = feasible_objects_list[random.randint(0, len(feasible_objects_list) - 1)]
+
+    if random_object_1.pen_total < random_object_2.pen_total:
+        random_object_1.penalty_exemp = 'Preferred'
+    elif random_object_1.pen_total > random_object_2.pen_total:
+        random_object_2.penalty_exemp = 'Preferred'
+    else:
+        random_object_1.penalty_exemp = 'Equivalent'
+        random_object_2.penalty_exemp = 'Equivalent'
+
+    if random_object_1.tolerance > random_object_2.tolerance:
+        random_object_1.poss_exemp = 'Preferred'
+    elif random_object_1.tolerance < random_object_2.tolerance:
+        random_object_2.poss_exemp = 'Preferred'
+    else:
+        random_object_1.poss_exemp = 'Equivalent'
+        random_object_2.poss_exemp = 'Equivalent'
