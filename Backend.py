@@ -56,10 +56,13 @@ def Backend(files):
     # Cross-referencing feasible objects to apply penalty
     cross_reference_penalty(myFeasibleObjects, myPenalties)
     cross_reference_poss(myFeasibleObjects, myPossibilistics)
-
-
-    # Exemplification
+    
+     # Exemplification
     exemplification(myFeasibleObjects)
+
+    # Return FeasibleObjects to be called by PyGUI
+    return myFeasibleObjects
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Writing to input files:
 def write_to_cnf_hard_constraints(constraints):
@@ -421,6 +424,8 @@ def store_feasible_objects(file_name, feasible_objects, attributes):
             attribute_index += 1
         object.name += '>'
 
+    return feasible_objects
+
 # Stores objects from output with penalty logic
 def store_penalty_logic_results(file_name, index, penalty_list):
     clasp_output = open(file_name, 'r')
@@ -463,6 +468,8 @@ def cross_reference_penalty(feasible_objects_list, penalty_list):
         for penalty in feasible_object.penalty_list:
             feasible_object.pen_total += penalty
 
+    return feasible_objects_list
+
 # Cross-Reference Feasible Objects and Objects from CLASP to Apply Tolerance
 def cross_reference_poss(feasible_objects_list, poss_list):
     for outer_index in range(len(feasible_objects_list)):
@@ -478,6 +485,9 @@ def cross_reference_poss(feasible_objects_list, poss_list):
         for tolerance in feasible_object.poss_list:
             if tolerance < feasible_object.tolerance:
                 feasible_object.tolerance = tolerance
+
+
+    return feasible_objects_list
 
 # ----------------------------------------------------------------------------------------------------------------------
 def exemplification(feasible_objects_list):

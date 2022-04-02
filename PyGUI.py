@@ -27,6 +27,7 @@ class PyGUI:
         self.penalties = []
         self.possibilistics = []
         self.qualitatives = []
+        self.feasibles = []
 
 
         # Create tab controller
@@ -58,25 +59,25 @@ class PyGUI:
 
     # Displays Penalty Logic variables
     def display_penalty(self):
-        i = 1
+        i = 0
         p = self.Logics[0]
         while i < len(p):
-            self.tree_pen.insert(parent='', index='end', iid=i, values=(i, p[i].input_as_words[0], p[i].pen))
+            self.tree_pen.insert(parent='', index='end', iid=i, values=(i+1, p[i].input_as_words[0], p[i].pen))
             i += 1
 
     # Displays Possibilistic Logic variables
     def display_possibilistic(self):
-        i = 1
+        i = 0
         p = self.Logics[1]
         while i < len(p):
-            self.tree_possib.insert(parent='', index='end', iid=i, values=(i, p[i].input_as_words[0], p[i].tol))
+            self.tree_possib.insert(parent='', index='end', iid=i, values=(i+1, p[i].input_as_words[0], p[i].tol))
             i += 1
 
     # Displays Qualitative Form Logic variables
     def display_qualitative(self):
-        i = 1
+        i = 0
         while i < len(self.Logics[2]):
-            self.tree_qual.insert(parent='', index='end', iid=i, values=(i, self.qualitatives[i].input))
+            self.tree_qual.insert(parent='', index='end', iid=i, values=(i+1, self.qualitatives[i].input))
             i += 1
 
     def call_parse_attributes(self):
@@ -104,7 +105,8 @@ class PyGUI:
         self.display_possibilistic()
         self.display_qualitative()
         self.files.append(self.logics_file)
-        Backend(self.files)
+        self.feasibles = Backend(self.files)
+        self.GUI_output()
 
 
     # Create page for all input variables
@@ -237,6 +239,15 @@ class PyGUI:
         self.button_logic.pack()
 
 
+    # Call store_feasible_objects from Backend to display in Treeview
+    def display_feasible_output(self):
+        i = 0
+        f = self.feasibles
+        while i < len(f):
+            self.tree_exist.insert(parent='', index='end', iid=i, values=(i + 1, f[i].name_as_num, f[i].name))
+            i += 1
+
+
     # Create Page for Feasible objects
     def make_exist_tab(self):
         # Create Existence Tab
@@ -296,9 +307,9 @@ class PyGUI:
         '''''''''''
 
         # Call logics for right side of exemplification tab
-        self.display_penalty_output(self.frm_exemp_right)
-        self.display_possib_output(self.frm_exemp_right)
-        self.display_qualitative_output(self.frm_exemp_right)
+        # self.display_penalty_output(self.frm_exemp_right)
+        # self.display_possib_output(self.frm_exemp_right)
+        # self.display_qualitative_output(self.frm_exemp_right)
 
 
     # Create page for single optimization output
@@ -322,9 +333,9 @@ class PyGUI:
         self.display_opti_qual(self.frm_opti_left)
 
         # Call logics for right side of opti tab
-        self.display_penalty_output(self.frm_opti_right)
-        self.display_possib_output(self.frm_opti_right)
-        self.display_qualitative_output(self.frm_opti_right)
+        # self.display_penalty_output(self.frm_opti_right)
+        # self.display_possib_output(self.frm_opti_right)
+        # self.display_qualitative_output(self.frm_opti_right)
 
 
     # Create page for omni optimization output
@@ -343,14 +354,16 @@ class PyGUI:
         self.frm_omni_right.grid(column=1, row=0)
 
         # Call logics for left side of omni tab
-        self.display_opti_pen(self.frm_omni_left)
-        self.display_opti_possib(self.frm_omni_left)
-        self.display_opti_qual(self.frm_omni_left)
+        self.display_omni_pen(self.frm_omni_left)
+        self.display_omni_possib(self.frm_omni_left)
+        self.display_omni_qual(self.frm_omni_left)
 
         # Call logics for right side of omni tab
         self.display_penalty_output(self.frm_omni_right)
         self.display_possib_output(self.frm_omni_right)
         self.display_qualitative_output(self.frm_omni_right)
+
+
 
     def display_penalty_output(self, input_frame):
         # Label for penalty output
@@ -451,9 +464,9 @@ class PyGUI:
         # Make columns for Treeview
         self.tree_opti_pen['columns'] = ("Obj #", "CLASP", "Object")
         self.tree_opti_pen.column("#0", width=0)
-        self.tree_opti_pen.column("Obj #", width=100)
-        self.tree_opti_pen.column("CLASP", width=200)
-        self.tree_opti_pen.column("Object", width=300)
+        self.tree_opti_pen.column("Obj #", width=100, anchor=CENTER)
+        self.tree_opti_pen.column("CLASP", width=200, anchor=CENTER)
+        self.tree_opti_pen.column("Object", width=300, anchor=CENTER)
 
         # Make column headers for Treeview
         self.tree_opti_pen.heading("Obj #", text="Obj #", anchor=CENTER)
@@ -476,9 +489,9 @@ class PyGUI:
         # Make columns for Treeview
         self.tree_opti_possib['columns'] = ("Obj #", "CLASP", "Object")
         self.tree_opti_possib.column("#0", width=0)
-        self.tree_opti_possib.column("Obj #", width=100)
-        self.tree_opti_possib.column("CLASP", width=200)
-        self.tree_opti_possib.column("Object", width=300)
+        self.tree_opti_possib.column("Obj #", width=100, anchor=CENTER)
+        self.tree_opti_possib.column("CLASP", width=200, anchor=CENTER)
+        self.tree_opti_possib.column("Object", width=300, anchor=CENTER)
 
         # Make column headers for Treeview
         self.tree_opti_possib.heading("Obj #", text="Obj #", anchor=CENTER)
@@ -501,9 +514,9 @@ class PyGUI:
         # Make columns for Treeview
         self.tree_opti_qual['columns'] = ("Obj #", "CLASP", "Object")
         self.tree_opti_qual.column("#0", width=0)
-        self.tree_opti_qual.column("Obj #", width=100)
-        self.tree_opti_qual.column("CLASP", width=200)
-        self.tree_opti_qual.column("Object", width=300)
+        self.tree_opti_qual.column("Obj #", width=100, anchor=CENTER)
+        self.tree_opti_qual.column("CLASP", width=200, anchor=CENTER)
+        self.tree_opti_qual.column("Object", width=300, anchor=CENTER)
 
         # Make column headers for Treeview
         self.tree_opti_qual.heading("Obj #", text="Obj #", anchor=CENTER)
@@ -512,3 +525,188 @@ class PyGUI:
 
         # Show tree
         self.tree_opti_qual.pack()
+
+
+    def display_omni_pen(self, input_frame):
+        # Label for optimization penalty output
+        self.lbl_omni_pen = Label(input_frame, text="Optimal Penalty Objects")
+        self.lbl_omni_pen.pack()
+
+        # Make Treeview widget for Optimal penalty output
+        self.tree_omni_pen = ttk.Treeview(input_frame, height=6)
+        self.tree_omni_pen.pack()
+
+        # Make columns for Treeview
+        self.tree_omni_pen['columns'] = ("Obj #", "CLASP", "Object")
+        self.tree_omni_pen.column("#0", width=0)
+        self.tree_omni_pen.column("Obj #", width=100, anchor=CENTER)
+        self.tree_omni_pen.column("CLASP", width=200, anchor=CENTER)
+        self.tree_omni_pen.column("Object", width=300, anchor=CENTER)
+
+        # Make column headers for Treeview
+        self.tree_omni_pen.heading("Obj #", text="Obj #", anchor=CENTER)
+        self.tree_omni_pen.heading("CLASP", text="CLASP", anchor=CENTER)
+        self.tree_omni_pen.heading("Object", text="Object", anchor=CENTER)
+
+        # Show tree
+        self.tree_omni_pen.pack()
+
+
+    def display_omni_possib(self, input_frame):
+        # Label for optimization penalty output
+        self.lbl_omni_possib = Label(input_frame, text="Optimal Possibilistic Objects")
+        self.lbl_omni_possib.pack()
+
+        # Make Treeview widget for Optimal penalty output
+        self.tree_omni_possib = ttk.Treeview(input_frame, height=6)
+        self.tree_omni_possib.pack()
+
+        # Make columns for Treeview
+        self.tree_omni_possib['columns'] = ("Obj #", "CLASP", "Object")
+        self.tree_omni_possib.column("#0", width=0)
+        self.tree_omni_possib.column("Obj #", width=100, anchor=CENTER)
+        self.tree_omni_possib.column("CLASP", width=200, anchor=CENTER)
+        self.tree_omni_possib.column("Object", width=300,anchor=CENTER)
+
+        # Make column headers for Treeview
+        self.tree_omni_possib.heading("Obj #", text="Obj #", anchor=CENTER)
+        self.tree_omni_possib.heading("CLASP", text="CLASP", anchor=CENTER)
+        self.tree_omni_possib.heading("Object", text="Object", anchor=CENTER)
+
+        # Show tree
+        self.tree_omni_possib.pack()
+
+
+    def display_omni_qual(self, input_frame):
+        # Label for optimization penalty output
+        self.lbl_omni_qual = Label(input_frame, text="Optimal Qualitative Choice Objects")
+        self.lbl_omni_qual.pack()
+
+        # Make Treeview widget for Optimal penalty output
+        self.tree_omni_qual = ttk.Treeview(input_frame, height=6)
+        self.tree_omni_qual.pack()
+
+        # Make columns for Treeview
+        self.tree_omni_qual['columns'] = ("Obj #", "CLASP", "Object")
+        self.tree_omni_qual.column("#0", width=0)
+        self.tree_omni_qual.column("Obj #", width=100, anchor=CENTER)
+        self.tree_omni_qual.column("CLASP", width=200, anchor=CENTER)
+        self.tree_omni_qual.column("Object", width=300, anchor=CENTER)
+
+        # Make column headers for Treeview
+        self.tree_omni_qual.heading("Obj #", text="Obj #", anchor=CENTER)
+        self.tree_omni_qual.heading("CLASP", text="CLASP", anchor=CENTER)
+        self.tree_omni_qual.heading("Object", text="Object", anchor=CENTER)
+
+        # Show tree
+        self.tree_omni_qual.pack()
+
+
+    # Fills tables with penalty output, calls cross_reference_penalty
+    def fill_penalty(self):
+        i = 0
+        f = self.feasibles
+        while i < len(f):
+            self.tree_penaltyo.insert(parent='', index='end', iid=i, values=(f[i].name_as_num,
+                                                                             f[i].penalty_list[0],
+                                                                             f[i].penalty_list[1],
+                                                                             f[i].penalty_list[2],
+                                                                             f[i].pen_total))
+            i += 1
+
+    # Fills tables with possibilistic output, calls cross_reference_possibilistic
+    def fill_possibilistic(self):
+        i = 0
+        f = self.feasibles
+        while i < len(f):
+            self.tree_possibo.insert(parent='', index='end', iid=i, values=(f[i].name_as_num,
+                                                                            f[i].poss_list[0],
+                                                                            f[i].poss_list[1],
+                                                                            f[i].poss_list[2],
+                                                                            f[i].tolerance))
+            i += 1
+
+
+
+    def fill_omni_pen(self):
+        i = 1
+        list_of_optimal = []
+        f = self.feasibles
+        min = f[0].pen_total
+        while i < len(f):
+            if f[i].pen_total < min:
+                min = f[i].pen_total
+            i += 1
+        i = 0
+        while i < len(f):
+            if f[i].pen_total == min:
+                list_of_optimal.append(i)
+            i += 1
+        i = 0
+        while i < len(list_of_optimal):
+            self.tree_omni_pen.insert(parent='', index='end', iid=i, values=(list_of_optimal[i]+1,
+                                                                             f[list_of_optimal[i]].name_as_num,
+                                                                             f[list_of_optimal[i]].name))
+            i += 1
+
+
+    def fill_omni_possib(self):
+        i = 1
+        list_of_optimal = []
+        f = self.feasibles
+        max = f[0].tolerance
+        while i < len(f):
+            if f[i].tolerance > max:
+                max = f[i].tolerance
+            i += 1
+        i = 0
+        while i < len(f):
+            if f[i].tolerance == max:
+                list_of_optimal.append(i)
+            i += 1
+        i = 0
+        while i < len(list_of_optimal):
+            self.tree_omni_possib.insert(parent='', index='end', iid=i, values=(list_of_optimal[i] + 1,
+                                                                             f[list_of_optimal[i]].name_as_num,
+                                                                             f[list_of_optimal[i]].name))
+
+    def fill_opti_pen(self):
+        i = 1
+        f = self.feasibles
+        min = f[0].pen_total
+        min_index = 0
+        while i < len(f):
+            if f[i].pen_total < min:
+                min = f[i].pen_total
+                min_index = i
+            i += 1
+        self.tree_opti_pen.insert(parent='', index='end', iid=i, values=(min_index+1,
+                                                                         f[min_index].name_as_num,
+                                                                         f[min_index].name))
+
+    def fill_opti_possib(self):
+        i = 1
+        f = self.feasibles
+        max = f[0].tolerance
+        max_index = 0
+        while i < len(f):
+            if f[i].tolerance > max:
+                max = f[i].tolerance
+                max_index = i
+            i += 1
+        self.tree_opti_possib.insert(parent='', index='end', iid=i, values=(max_index + 1,
+                                                                         f[max_index].name_as_num,
+                                                                         f[max_index].name))
+
+
+    # Display all outputs on GUI
+    def GUI_output(self):
+        self.display_feasible_output()
+
+        self.fill_penalty()
+        self.fill_possibilistic()
+
+        self.fill_opti_pen()
+        self.fill_opti_possib()
+        self.fill_omni_pen()
+        self.fill_omni_possib()
