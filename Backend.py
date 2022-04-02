@@ -19,7 +19,7 @@ def Backend(files):
     parse_attributes_file(files[0], myAttributes)
     parse_constraints_file(files[1], myAttributes, myConstraints)
     parse_logic_file(files[2], myPenalties, myPossibilistics, myQualitatives, myAttributes)
-    print(myQualitatives[0].output)
+
     # Call Clasp and write to file
     os.system("clasp CNF.txt -n 0 > CLASPOutput.txt")
 
@@ -388,7 +388,6 @@ def parse_qualitative_logic(qual_input, qualitatives, attributes):
         i += 1
     qualitatives.remove(qualitatives[0])
     return qualitatives
-# ----------------------------------------------------------------------------------------------------------------------
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -446,8 +445,8 @@ def store_possibilistic_logic_results(file_name, poss_list, index):
             line = line[0].split(' 0\n')
             poss_list[index].output_as_num.append(line[0])
 
-# ----------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
 # Cross-Referencing Feasible Objects and Objects from CLASP To Apply Penalty
 def cross_reference_penalty(feasible_objects_list, penalty_list):
     for outer_index in range(len(feasible_objects_list)):
