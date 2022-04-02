@@ -13,7 +13,6 @@ def Backend(files):
     myPossibilistics = []
     myQualitatives = []
     myFeasibleObjects = []
-    myFeasibleObject = []
 
     # Parsing methods for files given
     parse_attributes_file(files[0], myAttributes)
