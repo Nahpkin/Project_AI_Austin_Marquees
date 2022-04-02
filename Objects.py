@@ -55,6 +55,8 @@ class Feasible:
         self.pen_total = 0
         self.poss_list = None
         self.tolerance = 1
+        self.penalty_exemp = ''
+        self.poss_exemp = ''
 
 class Qualitative:
     def __init__(self):
