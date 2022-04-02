@@ -512,3 +512,8 @@ def exemplification(feasible_objects_list):
     else:
         random_object_1.poss_exemp = 'Equivalent'
         random_object_2.poss_exemp = 'Equivalent'
+
+    Output = []
+    Output.append(random_object_1)
+    Output.append(random_object_2)
+    return Output

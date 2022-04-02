@@ -1,3 +1,4 @@
+import random
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
@@ -7,6 +8,7 @@ import re
 import os
 import platform
 from Objects import *
+from random import randint
 
 
 class PyGUI:
@@ -257,11 +259,8 @@ class PyGUI:
 
         # Create frame for left side of exist tab
         self.frm_exist_left = Frame(self.tab_exist, padx=15)
-        self.frm_exist_left.grid(column=0, row=0)
+        self.frm_exist_left.pack()
 
-        # Create frame for right side of exist tab
-        self.frm_exist_right = Frame(self.tab_exist)
-        self.frm_exist_right.grid(column=1, row=0)
 
         # Create and show Title label for left exist tab
         self.lbl_exist = Label(self.frm_exist_left, text="Feasible Objects")
@@ -285,10 +284,6 @@ class PyGUI:
         # Show tree
         self.tree_exist.pack()
 
-        # Call Logics for right side of exist tab
-        self.display_penalty_output(self.frm_exist_right)
-        self.display_possib_output(self.frm_exist_right)
-        self.display_qualitative_output(self.frm_exist_right)
 
 
     # Create page for 2 feasible objects exemplification output
@@ -298,18 +293,35 @@ class PyGUI:
         self.tab_exemp.pack()
         self.tab_notebook.add(self.tab_exemp, text="Exemplification")
 
-        # Make right side of exemplification tab
-        self.frm_exemp_right = Frame(self.tab_exemp)
-        self.frm_exemp_right.grid(column=1, row=0)
+        # Make exemplification Frame
+        self.frm_exemp = Frame(self.tab_exemp)
+        self.frm_exemp.pack()
 
-        '''''''''''
-        TODO: Waiting on logic for left side of exemplification tab
-        '''''''''''
+        # Make exemplification label
+        self.lbl_exemp = Label(self.frm_exemp, text="Exemplification")
+        self.lbl_exemp.pack()
 
-        # Call logics for right side of exemplification tab
-        # self.display_penalty_output(self.frm_exemp_right)
-        # self.display_possib_output(self.frm_exemp_right)
-        # self.display_qualitative_output(self.frm_exemp_right)
+        # Create Treeview for exemplification tab
+        self.tree_exemp = ttk.Treeview(self.frm_exemp, height=10)
+
+        # Create tree columns
+        self.tree_exemp['columns'] = ("Obj #", "Object", "Penalty", "Possibilistic", "Qualitative")
+        self.tree_exemp.column("#0", width=0)
+        self.tree_exemp.column("Obj #", width=100, minwidth=50, anchor=CENTER)
+        self.tree_exemp.column("Object", width=200, minwidth=50, anchor=CENTER)
+        self.tree_exemp.column("Penalty", width=200, minwidth=50, anchor=CENTER)
+        self.tree_exemp.column("Possibilistic", width=200, minwidth=50, anchor=CENTER)
+        self.tree_exemp.column("Qualitative", width=200, minwidth=50, anchor=CENTER)
+
+        # Add column headers
+        self.tree_exemp.heading("Obj #", text="Obj #", anchor=CENTER)
+        self.tree_exemp.heading("Object", text="Object", anchor=CENTER)
+        self.tree_exemp.heading("Penalty", text="Penalty", anchor=CENTER)
+        self.tree_exemp.heading("Possibilistic", text="Possibilistic", anchor=CENTER)
+        self.tree_exemp.heading("Qualitative", text="Qualitative", anchor=CENTER)
+
+        # Show tree
+        self.tree_exemp.pack()
 
 
     # Create page for single optimization output
@@ -660,6 +672,7 @@ class PyGUI:
                 max = f[i].tolerance
             i += 1
         i = 0
+        j = 0
         while i < len(f):
             if f[i].tolerance == max:
                 list_of_optimal.append(i)
@@ -667,8 +680,9 @@ class PyGUI:
         i = 0
         while i < len(list_of_optimal):
             self.tree_omni_possib.insert(parent='', index='end', iid=i, values=(list_of_optimal[i] + 1,
-                                                                             f[list_of_optimal[i]].name_as_num,
-                                                                             f[list_of_optimal[i]].name))
+                                                                                   f[list_of_optimal[i]].name_as_num,
+                                                                                   f[list_of_optimal[i]].name))
+            i += 1
 
     def fill_opti_pen(self):
         i = 1
@@ -698,6 +712,17 @@ class PyGUI:
                                                                          f[max_index].name_as_num,
                                                                          f[max_index].name))
 
+    def fill_exemplification(self):
+        f_input = exemplification(self.feasibles)
+        self.tree_exemp.insert(parent='', index='end', iid=1, values=(f_input[0].name_as_num,
+                                                                      f_input[0].name,
+                                                                      f_input[0].penalty_exemp,
+                                                                      f_input[0].poss_exemp))
+        self.tree_exemp.insert(parent='', index='end', iid=2, values=(f_input[1].name_as_num,
+                                                                      f_input[1].name,
+                                                                      f_input[1].penalty_exemp,
+                                                                      f_input[1].poss_exemp))
+
 
     # Display all outputs on GUI
     def GUI_output(self):
@@ -705,6 +730,8 @@ class PyGUI:
 
         self.fill_penalty()
         self.fill_possibilistic()
+
+        self.fill_exemplification()
 
         self.fill_opti_pen()
         self.fill_opti_possib()
